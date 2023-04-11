@@ -4,5 +4,4 @@ public struct Blank: Codable {
 
     public init() {
     }
-
 }
