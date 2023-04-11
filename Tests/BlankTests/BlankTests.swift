@@ -2,10 +2,24 @@ import XCTest
 @testable import Blank
 
 final class BlankTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(Blank().text, "Hello, World!")
+    var systemUnderTest: Blank!
+
+    override func setUp() async throws {
+        systemUnderTest = Blank()
+    }
+
+    override func tearDown() async throws {
+        systemUnderTest = nil
+    }
+
+    func testAdd() throws {
+        let left = 1
+        let right = 2
+        let result = systemUnderTest.add(left, right)
+        XCTAssertEqual(result, left + right)
+    }
+
+    func testText() throws {
+        XCTAssertEqual(systemUnderTest.text, "Hello, World!")
     }
 }
