@@ -6,7 +6,7 @@
 set -e
 
 export SCRIPT_NAME=`basename $0`
-export EXECUTION_IDENTIFIER=`uuidgen`
+export EXECUTION_IDENTIFIER=`cat /proc/sys/kernel/random/uuid`
 
 echo Hello from the $SCRIPT_NAME script.
 
