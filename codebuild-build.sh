@@ -17,10 +17,10 @@ fi
 
 echo Collecting contents
 zip -r $EXECUTION_IDENTIFIER.zip .
-#aws s3 cp $EXECUTION_IDENTIFIER.zip s3://$BUCKET_NAME/$OBJECT_KEY
 aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $EXECUTION_IDENTIFIER.zip
 
 echo Starting $PIPELINE_NAME pipeline execution with $EXECUTION_IDENTIFIER
 aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text
 echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $EXECUTION_IDENTIFIER
+
