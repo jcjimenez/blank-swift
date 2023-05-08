@@ -6,16 +6,16 @@
 set -e
 
 export SCRIPT_NAME=`basename $0`
-
+export BUILD_IDENTIFIER=`sed 'echo $CODEBUILD_BUILD_ID | s/[^a-zA-Z0-9-]/-/g'`
 echo Hello from the $SCRIPT_NAME script.
 
 echo Collecting contents
-export SOURCE_ZIP=$CODEBUILD_BUILD_ID.zip
+export SOURCE_ZIP=$BUILD_IDENTIFIER.zip
 zip -r $SOURCE_ZIP .
 aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $SOURCE_ZIP
 
 echo Starting $PIPELINE_NAME pipeline execution
-export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $CODEBUILD_BUILD_ID --output text`
+export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $BUILD_IDENTIFIER --output text`
 echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $PIPELINE_EXECUTION_IDENTIFIER
 
