@@ -6,7 +6,13 @@
 set -e
 
 export SCRIPT_NAME=`basename $0`
+export EXECUTION_IDENTIFIER=`uuidgen`
 
 echo Hello from the $SCRIPT_NAME script.
 
-aws codepipeline start-pipeline-execution --name $PIPELINE_NAME
+echo Listing contents:
+find .
+
+echo Starting $PIPELINE_NAME pipeline execution with $EXECUTION_IDENTIFIER
+aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER
+echo Execution of $PIPELINE_NAME pipeline started with $EXECUTION_IDENTIFIER
