@@ -14,5 +14,6 @@ echo Listing contents:
 find .
 
 echo Starting $PIPELINE_NAME pipeline execution with $EXECUTION_IDENTIFIER
-aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER
+aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text
+echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $EXECUTION_IDENTIFIER
