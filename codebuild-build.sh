@@ -8,3 +8,5 @@ set -e
 export SCRIPT_NAME=`basename $0`
 
 echo Hello from the $SCRIPT_NAME script.
+
+aws codepipeline start-pipeline-execution --name $PIPELINE_NAME
