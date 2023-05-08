@@ -24,3 +24,5 @@ aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request
 echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $EXECUTION_IDENTIFIER
 
+echo TODO Waiting for pipeline to complete
+
