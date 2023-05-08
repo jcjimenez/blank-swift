@@ -6,21 +6,16 @@
 set -e
 
 export SCRIPT_NAME=`basename $0`
-export EXECUTION_IDENTIFIER=`cat /proc/sys/kernel/random/uuid`
 
 echo Hello from the $SCRIPT_NAME script.
-if [ -z "$EXECUTION_IDENTIFIER" ]
-then
-   echo Unable to generate EXECUTION_IDENTIFIER 1>&2;
-   exit 1
-fi
 
 echo Collecting contents
-zip -r $EXECUTION_IDENTIFIER.zip .
-aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $EXECUTION_IDENTIFIER.zip
+export SOURCE_ZIP=$CODEBUILD_BUILD_ID.zip
+zip -r $SOURCE_ZIP .
+aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $SOURCE_ZIP
 
 echo Starting $PIPELINE_NAME pipeline execution
-export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text`
+export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $CODEBUILD_BUILD_ID --output text`
 echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $PIPELINE_EXECUTION_IDENTIFIER
 
@@ -28,7 +23,7 @@ echo Waiting for pipeline to complete
 while aws codepipeline get-pipeline-execution --pipeline-name $PIPELINE_NAME --pipeline-execution-id $PIPELINE_EXECUTION_IDENTIFIER --query pipelineExecution.status | grep -q InProgress;
 do
     echo Pipeline execution in progress, waiting...
-    sleep 3
+    sleep 5
 done
 
 # Succeeded
@@ -37,7 +32,7 @@ then
     echo Pipeline execution succeeded
     exit 0
 else
-    echo Detected non-successful pipeline execution for pipeline $PIPELINE_NAME $PIPELINE_EXECUTION_IDENTIFIER
+    echo Detected non-successful pipeline execution for pipeline $PIPELINE_NAME $PIPELINE_EXECUTION_IDENTIFIER 1>&2;
     exit 20
 fi
 
