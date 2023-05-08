@@ -9,9 +9,15 @@ export SCRIPT_NAME=`basename $0`
 export EXECUTION_IDENTIFIER=`cat /proc/sys/kernel/random/uuid`
 
 echo Hello from the $SCRIPT_NAME script.
+if [ -z "$EXECUTION_IDENTIFIER" ]
+then
+   echo Unable to generate EXECUTION_IDENTIFIER 1>&2;
+   exit 1
+fi
 
-echo Listing contents:
-find .
+echo Collecting contents
+zip -r $EXECUTION_IDENTIFIER.zip .
+aws s3 cp $EXECUTION_IDENTIFIER.zip s3://$BUCKET_NAME/$OBJECT_KEY
 
 echo Starting $PIPELINE_NAME pipeline execution with $EXECUTION_IDENTIFIER
 aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text
