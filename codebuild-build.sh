@@ -19,10 +19,25 @@ echo Collecting contents
 zip -r $EXECUTION_IDENTIFIER.zip .
 aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $EXECUTION_IDENTIFIER.zip
 
-echo Starting $PIPELINE_NAME pipeline execution with $EXECUTION_IDENTIFIER
-aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text
+echo Starting $PIPELINE_NAME pipeline execution
+export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $EXECUTION_IDENTIFIER --output text`
 echo $?
-echo Execution of $PIPELINE_NAME pipeline started with $EXECUTION_IDENTIFIER
+echo Execution of $PIPELINE_NAME pipeline started with $PIPELINE_EXECUTION_IDENTIFIER
 
-echo TODO Waiting for pipeline to complete
+echo Waiting for pipeline to complete
+while aws codepipeline get-pipeline-execution --pipeline-name $PIPELINE_NAME --pipeline-execution-id $PIPELINE_EXECUTION_IDENTIFIER --query pipelineExecution.status | grep -q InProgress;
+do
+    echo Pipeline execution in progress, waiting...
+    sleep 3
+done
+
+# Succeeded
+if aws codepipeline get-pipeline-execution --pipeline-name $PIPELINE_NAME --pipeline-execution-id $PIPELINE_EXECUTION_IDENTIFIER --query pipelineExecution.status | grep -q Succeeded;
+then
+    echo Pipeline execution succeeded
+    exit 0
+else
+    echo Detected non-successful pipeline execution for pipeline $PIPELINE_NAME $PIPELINE_EXECUTION_IDENTIFIER
+    exit 20
+fi
 
