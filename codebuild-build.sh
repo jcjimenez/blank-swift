@@ -6,16 +6,22 @@
 set -e
 
 export SCRIPT_NAME=`basename $0`
-export BUILD_IDENTIFIER=`sed 'echo $CODEBUILD_BUILD_ID | s/[^a-zA-Z0-9-]/-/g'`
+export SCRIPT_IDENTIFIER=`cat /proc/sys/kernel/random/uuid`
+
 echo Hello from the $SCRIPT_NAME script.
+if [ -z "$SCRIPT_IDENTIFIER" ]
+then
+   echo Unable to generate SCRIPT_IDENTIFIER 1>&2;
+   exit 1
+fi
 
 echo Collecting contents
-export SOURCE_ZIP=$BUILD_IDENTIFIER.zip
+export SOURCE_ZIP=$SCRIPT_IDENTIFIER.zip
 zip -r $SOURCE_ZIP .
 aws s3api put-object --bucket $BUCKET_NAME --key $OBJECT_KEY --body $SOURCE_ZIP
 
 echo Starting $PIPELINE_NAME pipeline execution
-export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $BUILD_IDENTIFIER --output text`
+export PIPELINE_EXECUTION_IDENTIFIER=`aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --client-request-token $SCRIPT_IDENTIFIER --output text`
 echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $PIPELINE_EXECUTION_IDENTIFIER
 
