@@ -26,6 +26,7 @@ echo $?
 echo Execution of $PIPELINE_NAME pipeline started with $PIPELINE_EXECUTION_IDENTIFIER
 
 echo Waiting for pipeline to complete
+sleep 5
 while aws codepipeline get-pipeline-execution --pipeline-name $PIPELINE_NAME --pipeline-execution-id $PIPELINE_EXECUTION_IDENTIFIER --query pipelineExecution.status | grep -q InProgress;
 do
     echo Pipeline execution in progress, waiting...
